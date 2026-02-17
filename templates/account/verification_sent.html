@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Your Email{% endblock %}
+
+{% block content %}
+<div class="container d-flex flex-column justify-content-center min-vh-100 py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-5">
+            
+            <div class="card shadow-card border-0 rounded-3 overflow-hidden">
+                
+                <div class="card-header bg-primary text-white p-4 text-center">
+                    <h3 class="mb-0 fw-bold">Check Your Email</h3>
+                </div>
+
+                <div class="card-body p-5 bg-white text-center">
+                    
+                    <div class="mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="#0d6efd" class="bi bi-envelope-paper-fill" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M6.5 9.5 3 7.5v-6A1.5 1.5 0 0 1 4.5 0h7A1.5 1.5 0 0 1 13 1.5v6l-3.5 2L8 8.75l-1.5.75ZM1.059 3.635 2 3.133v3.753L0 5.713V5.4a2 2 0 0 1 1.059-1.765ZM16 5.713l-2 1.173V3.133l.941.502A2 2 0 0 1 16 5.4v.313Zm0 1.16-5.693 3.337L16 13.372v-6.5Zm-8 3.199 7.941 4.412H.059L8 10.072Zm-8 3.3 5.693-3.337L0 6.873v6.5Z"/>
+                        </svg>
+                    </div>
+
+                    <h5 class="fw-bold mb-3">Verification Email Sent</h5>
+                    
+                    <p class="text-secondary mb-4">
+                        We have sent an email to <strong>{{ request.GET.email }}</strong>. <br>
+                        Please follow the link in the email to activate your account.
+                    </p>
+
+                    <p class="small text-muted mb-4">
+                        (Since you are running locally, look for the link in your terminal/console logs)
+                    </p>
+
+                    <div class="d-grid">
+                        <a href="{% url 'account_login' %}" class="btn btn-outline-primary btn-lg">
+                            Back to Login
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

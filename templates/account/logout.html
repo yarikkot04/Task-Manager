@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Out{% endblock %}
+
+{% block content %}
+<div class="container d-flex flex-column justify-content-center min-vh-100 py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-5">
+            
+            <div class="card shadow-card border-0 rounded-3 overflow-hidden">
+                
+                <div class="card-header bg-primary text-white p-4 text-center">
+                    <h3 class="mb-0 fw-bold">Sign Out</h3>
+                    <p class="mb-0 opacity-75 fw-light">Are you sure you want to leave?</p>
+                </div>
+
+                <div class="card-body p-5 bg-white text-center">
+                    
+                    <p class="text-secondary mb-4 fs-5">
+                        Are you sure you want to sign out?
+                    </p>
+
+                    <form method="post" action="{% url 'account_logout' %}">
+                        {% csrf_token %}
+                        
+                        <div class="d-grid gap-3">
+                            <button type="submit" class="btn btn-danger btn-lg fw-bold py-3">
+                                Yes, Sign Out
+                            </button>
+                            
+                            <a href="/" class="btn btn-outline-secondary btn-lg fw-bold py-3">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
