@@ -1,0 +1,16 @@
+asgiref==3.11.1
+cfgv==3.5.0
+distlib==0.4.0
+Django==5.2.11
+django-allauth==65.14.3
+django-environ==0.12.1
+django-htmx==1.27.0
+filelock==3.24.2
+identify==2.6.16
+nodeenv==1.10.0
+platformdirs==4.9.2
+pre_commit==4.5.1
+PyYAML==6.0.3
+ruff==0.15.1
+sqlparse==0.5.5
+virtualenv==20.37.0
