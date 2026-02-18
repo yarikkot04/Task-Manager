@@ -8,6 +8,9 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
+<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+<script src="//unpkg.com/alpinejs" defer></script>
+
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-12 col-lg-9">
@@ -21,109 +24,14 @@
                 </form>
             </div>
 
-            {% for project in projects %}
-            <div class="todo-card" id="project-{{ project.id }}">
-                
-                <div class="todo-header d-flex align-items-center justify-content-between">
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="bi bi-calendar-event opacity-75"></i>
-                        <span class="fw-bold fs-5">{{ project.name }}</span>
-                    </div>
-                    
-                    <div class="header-actions gap-3 d-flex">
-                        <i class="bi bi-pencil-fill" title="Edit List"></i>
-                        <i class="bi bi-trash-fill" title="Delete List"></i>
-                    </div>
-                </div>
-
-                <div class="input-area" 
-                     style="padding: 0; border: none;"
-                     x-data="{ adding: false }">
-
-                    <div x-show="!adding" class="p-2 border-bottom border-top" style="background-color: #e8e8e8; border-color: #ccc;">
-                        <form hx-post="{% url 'task-create' project.id %}"
-                              hx-target="#task-list-{{ project.id }}"
-                              hx-swap="beforeend"
-                              hx-on::after-request="this.reset()"
-                              class="row g-2 align-items-center mb-0">
-                            
-                            {% csrf_token %}
-                            <div class="col-auto">
-                                <i class="bi bi-plus-lg plus-icon px-2" 
-                                   style="cursor: pointer;" 
-                                   title="Switch to expanded mode"
-                                   @click="adding = true"></i>
-                            </div>
-                            <div class="col">
-                                <input type="text" name="title" required
-                                       class="form-control form-control-sm border shadow-sm" 
-                                       placeholder="Start typing here to create a task...">
-                            </div>
-                            <div class="col-auto">
-                                <input type="date" name="deadline"
-                                       class="form-control form-control-sm border shadow-sm"
-                                       style="width: 130px;"
-                                       title="Set deadline (optional)">
-                            </div>
-                            <div class="col-auto">
-                                <button type="submit" class="btn btn-glossy-green btn-sm px-3">Add Task</button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <div x-show="adding" 
-                         class="edit-mode-container p-3" 
-                         style="display: none; border-left: none; border-bottom: 1px solid #ccc;"
-                         x-data="{ datePart: '', timePart: '' }"> 
-
-                        <form hx-post="{% url 'task-create' project.id %}"
-                              hx-target="#task-list-{{ project.id }}"
-                              hx-swap="beforeend"
-                              hx-on::after-request="this.reset(); adding = false; datePart = ''; timePart = '';">
-                            
-                            {% csrf_token %}
-                            <div class="row g-3">
-                                <div class="col-12">
-                                    <label class="form-label text-muted small fw-bold text-uppercase">New Task Title:</label>
-                                    <textarea name="title" rows="3" class="form-control" 
-                                              style="resize: vertical; min-height: 80px;" 
-                                              required placeholder="Describe your task..."
-                                              x-effect="if(adding) $nextTick(() => $el.focus())"></textarea>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label text-muted small fw-bold text-uppercase">Date:</label>
-                                    <div class="input-group">
-                                        <input type="date" class="form-control" x-model="datePart">
-                                        <span class="input-group-text"><i class="bi bi-calendar"></i></span>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label text-muted small fw-bold text-uppercase">Time:</label>
-                                    <div class="input-group">
-                                        <input type="time" class="form-control" x-model="timePart">
-                                        <span class="input-group-text"><i class="bi bi-clock"></i></span>
-                                    </div>
-                                </div>
-                                <input type="hidden" name="deadline" :value="datePart && timePart ? datePart + ' ' + timePart : (datePart ? datePart : '')">
-                                <div class="col-12 d-flex justify-content-end gap-2 mt-3 pt-2 border-top">
-                                    <button type="button" @click="adding = false" class="btn btn-secondary btn-sm px-3">Cancel</button>
-                                    <button type="submit" class="btn btn-glossy-green btn-sm px-4">Add Task</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <div class="task-list" id="task-list-{{ project.id }}">
-                    {% include "tasks/partials/task_list_content.html" with tasks=project.tasks.all %}
-                </div>
-                
-                <div style="height: 10px; background: white;"></div>
+            <div id="project-list-container">
+                {% for project in projects %}
+                    {% include "tasks/partials/project_card.html" %}
+                {% endfor %}
             </div>
-            {% endfor %}
 
-            <div class="text-center mt-5 mb-5">
-                <button class="btn btn-big-blue">
+            <div class="text-center mt-5 mb-5" x-data>
+                <button class="btn btn-big-blue" @click="$dispatch('open-create-project-modal')">
                     <i class="bi bi-plus-lg me-2"></i> Add TODO List
                 </button>
             </div>
@@ -132,8 +40,13 @@
     </div>
 </div>
 
-<div x-data="{ show: false, confirmCallback: null }"
-     @open-delete-modal.window="show = true; confirmCallback = $event.detail.confirm"
+<div x-data="{ show: false, title: 'Delete Item', body: 'Are you sure?', confirmCallback: null }"
+     @open-delete-modal.window="
+        show = true; 
+        title = $event.detail.title || 'Delete Item';
+        body = $event.detail.body || 'Are you sure you want to delete this?';
+        confirmCallback = $event.detail.confirm;
+     "
      class="modal fade" 
      :class="{ 'show d-block': show }" 
      tabindex="-1" 
@@ -144,22 +57,79 @@
      role="dialog">
     
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content shadow border-0">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold text-danger">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Delete Task
+        <div class="modal-content shadow border-0" style="overflow: hidden; border-radius: 8px;">
+            
+            <div class="modal-header todo-header-danger text-white p-3 border-0">
+                <h5 class="modal-title fw-bold d-flex align-items-center">
+                    <i class="bi bi-exclamation-triangle-fill me-2 opacity-75"></i>
+                    <span x-text="title"></span>
                 </h5>
-                <button type="button" class="btn-close" @click="show = false"></button>
+                <button type="button" class="btn-close btn-close-white" @click="show = false"></button>
             </div>
-            <div class="modal-body text-secondary">
-                <p class="mb-1">Are you sure you want to delete this task?</p>
-                <small class="text-muted">This action cannot be undone.</small>
+            
+            <div class="modal-body p-4 bg-light-gray">
+                <p class="mb-3 lead fs-6" x-text="body" style="color: #444;"></p>
+                
+                <div class="alert alert-danger border-0 shadow-sm d-flex align-items-center p-2 mb-4">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    <small>Warning: This action cannot be undone.</small>
+                </div>
+                
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-secondary px-3" @click="show = false">Cancel</button>
+                    <button type="button" class="btn btn-glossy-red px-4" @click="confirmCallback(); show = false">
+                        <i class="bi bi-trash-fill me-1"></i> Delete
+                    </button>
+                </div>
             </div>
-            <div class="modal-footer border-0 pt-0">
-                <button type="button" class="btn btn-light border" @click="show = false">Cancel</button>
-                <button type="button" class="btn btn-danger px-4" @click="confirmCallback(); show = false">
-                    <i class="bi bi-trash-fill me-1"></i> Delete
-                </button>
+        </div>
+    </div>
+</div>
+
+<div x-data="{ show: false }"
+     @open-create-project-modal.window="show = true; $nextTick(() => $refs.projectNameInput.focus())"
+     class="modal fade" 
+     :class="{ 'show d-block': show }" 
+     tabindex="-1" 
+     style="background-color: rgba(0,0,0,0.5);"
+     x-show="show" 
+     x-transition.opacity
+     aria-modal="true"
+     role="dialog">
+    
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow border-0" style="overflow: hidden; border-radius: 8px;">
+            
+            <div class="modal-header todo-header text-white p-3 border-0">
+                <h5 class="modal-title fw-bold d-flex align-items-center">
+                    <i class="bi bi-folder-plus me-2 opacity-75"></i>
+                    Create New Project
+                </h5>
+                <button type="button" class="btn-close btn-close-white" @click="show = false"></button>
+            </div>
+            
+            <div class="modal-body p-4 bg-light-gray">
+                <form hx-post="{% url 'project-create' %}"
+                      hx-target="#project-list-container"
+                      hx-swap="beforeend"
+                      hx-on::after-request="show = false; this.reset();">
+                    
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-uppercase small text-muted">Project Name</label>
+                        <input type="text" 
+                               name="name" 
+                               class="form-control form-control-lg border shadow-sm" 
+                               required 
+                               x-ref="projectNameInput" 
+                               placeholder="e.g. Work, Shopping, Vacation...">
+                    </div>
+                    
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-secondary px-3" @click="show = false">Cancel</button>
+                        <button type="submit" class="btn btn-glossy-green px-4">Create Project</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

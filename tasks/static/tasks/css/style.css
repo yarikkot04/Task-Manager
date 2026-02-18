@@ -78,7 +78,6 @@ body.bg-light-gray {
     background-color: inherit;
 }
 
-/* Текст завдання */
 .task-title-text {
     transition: color 0.2s;
 }
@@ -223,4 +222,25 @@ body.bg-light-gray {
 .btn-logout:hover {
     background: rgba(0,0,0,0.2);
     color: #fff;
+}
+
+.todo-header-danger {
+    background: linear-gradient(to bottom, #d9534f 0%, #c9302c 100%);
+    color: white;
+    border-bottom: 1px solid #ac2925;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
+.btn-glossy-red {
+    background: linear-gradient(to bottom, #d9534f 0%, #c9302c 100%);
+    border: 1px solid #ac2925;
+    color: white;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 1px 2px rgba(0,0,0,0.15);
+    text-shadow: 0 -1px 0 rgba(0,0,0,0.2);
+    transition: all 0.2s;
+}
+
+.btn-glossy-red:hover {
+    background: linear-gradient(to bottom, #c9302c 0%, #ac2925 100%);
+    color: white;
 }

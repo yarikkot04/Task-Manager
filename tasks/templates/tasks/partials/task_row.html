@@ -94,7 +94,11 @@
                    hx-target="#task-{{ task.id }}"
                    hx-swap="outerHTML"
                    hx-trigger="confirmed"
-                   @click="$dispatch('open-delete-modal', { confirm: () => $el.dispatchEvent(new Event('confirmed')) })">
+                   @click="$dispatch('open-delete-modal', { 
+                       title: 'Delete Task', 
+                       body: 'Are you sure you want to delete this task?', 
+                       confirm: () => $el.dispatchEvent(new Event('confirmed')) 
+                   })">
                 </i>
             </div>
         </div>

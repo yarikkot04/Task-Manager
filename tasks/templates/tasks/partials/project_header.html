@@ -1,0 +1,39 @@
+<div class="todo-header d-flex align-items-center justify-content-between" 
+     id="project-header-{{ project.id }}"
+     x-data="{ editing: false }">
+    
+    <div class="d-flex align-items-center gap-2 w-100" x-show="!editing">
+        <i class="bi bi-calendar-event opacity-75"></i>
+        <span class="fw-bold fs-5">{{ project.name }}</span>
+    </div>
+
+    <div class="w-100 me-2" x-show="editing" style="display: none;">
+        <form hx-post="{% url 'project-update' project.id %}"
+              hx-target="#project-header-{{ project.id }}"
+              hx-swap="outerHTML"
+              class="d-flex gap-2">
+            {% csrf_token %}
+            <input type="text" name="name" value="{{ project.name }}" 
+                   class="form-control form-control-sm text-dark" required
+                   @keydown.escape="editing = false">
+            <button type="submit" class="btn btn-sm btn-light text-primary"><i class="bi bi-check-lg"></i></button>
+            <button type="button" class="btn btn-sm btn-light text-danger" @click="editing = false"><i class="bi bi-x-lg"></i></button>
+        </form>
+    </div>
+    
+    <div class="header-actions gap-3 d-flex" x-show="!editing">
+        <i class="bi bi-pencil-fill" title="Edit List" @click="editing = true"></i>
+        
+        <i class="bi bi-trash-fill" title="Delete List"
+           hx-delete="{% url 'project-delete' project.id %}"
+           hx-target="#project-{{ project.id }}"
+           hx-swap="outerHTML"
+           hx-trigger="confirmed"
+           @click="$dispatch('open-delete-modal', { 
+               title: 'Delete Project', 
+               body: 'Are you sure you want to delete project &quot;{{ project.name }}&quot;? All tasks inside will be lost.',
+               confirm: () => $el.dispatchEvent(new Event('confirmed')) 
+           })">
+        </i>
+    </div>
+</div>
