@@ -8,6 +8,13 @@ class Project(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="projects")
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "name"], name="unique_project_per_user"
+            )
+        ]
+
     def __str__(self):
         return self.name
 

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Task
+from tasks.models import Task, Project
 
 
 class TaskForm(forms.ModelForm):
@@ -9,4 +9,15 @@ class TaskForm(forms.ModelForm):
         widgets = {
             "deadline": forms.DateTimeInput(attrs={"type": "datetime-local"}),
             "title": forms.TextInput(attrs={"class": "form-control"}),
+        }
+
+
+class ProjectForm(forms.ModelForm):
+    class Meta:
+        model = Project
+        fields = ["name"]
+        widgets = {
+            "name": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Project Name"}
+            ),
         }

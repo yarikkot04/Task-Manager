@@ -1,7 +1,7 @@
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from tasks.models import Project, Task
-from tasks.forms import TaskForm
+from tasks.forms import TaskForm, ProjectForm
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
 from django.views import View
@@ -97,3 +97,39 @@ class TaskCompleteView(LoginRequiredMixin, View):
         task.save(update_fields=["is_done"])
 
         return render(request, "tasks/partials/task_row.html", {"task": task})
+
+
+class ProjectCreateView(LoginRequiredMixin, CreateView):
+    model = Project
+    form_class = ProjectForm
+    template_name = "tasks/partials/project_card.html"
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        self.object = form.save()
+        return render(self.request, self.template_name, {"project": self.object})
+
+
+class ProjectUpdateView(LoginRequiredMixin, UpdateView):
+    model = Project
+    form_class = ProjectForm
+    template_name = "tasks/partials/project_header.html"
+
+    def get_queryset(self):
+        return Project.objects.filter(user=self.request.user)
+
+    def form_valid(self, form):
+        self.object = form.save()
+        return render(self.request, self.template_name, {"project": self.object})
+
+
+class ProjectDeleteView(LoginRequiredMixin, DeleteView):
+    model = Project
+
+    def get_queryset(self):
+        return Project.objects.filter(user=self.request.user)
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.delete()
+        return HttpResponse("")
