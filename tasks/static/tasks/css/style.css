@@ -1,0 +1,226 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+body.bg-light-gray {
+    background: linear-gradient(180deg, #e8dba3 0%, #dca243 100%) fixed !important;
+    min-height: 100%;
+}
+
+.todo-card {
+    background-color: white;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    overflow: hidden;
+    margin-bottom: 40px;
+}
+
+.todo-header {
+    background: linear-gradient(to bottom, #6face2 0%, #3776b2 100%);
+    padding: 10px 15px;
+    border-bottom: 1px solid #285e8e;
+    color: white;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.4);
+}
+
+.header-actions i {
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: color 0.2s;
+}
+.header-actions i:hover {
+    color: white;
+}
+
+.input-area {
+    background-color: #e8e8e8;
+    padding: 8px 15px;
+    border-top: 1px solid #fff;
+    border-bottom: 1px solid #ccc;
+}
+
+.plus-icon {
+    color: #557c5e;
+    font-size: 1.5rem;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.input-area input.form-control {
+    border: 1px solid #aaa;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.task-list {
+    background-color: white;
+}
+
+.task-row {
+    border-bottom: 1px solid #e0e0e0;
+    min-height: 44px;
+    transition: background-color 0.1s;
+    align-items: stretch !important; 
+}
+
+.task-row:hover {
+    background-color: #ffffd4;
+}
+
+.separator-col {
+    border-right: 1px solid #f0f0f0;
+    width: 50px; 
+    min-width: 50px;
+    background-color: white;
+    background-color: inherit;
+}
+
+/* Текст завдання */
+.task-title-text {
+    transition: color 0.2s;
+}
+.task-title-text:hover {
+    color: #333 !important;
+}
+
+.text-decoration-line-through {
+    color: #aaa !important;
+}
+
+.custom-checkbox {
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
+    border: 1px solid #adb5bd;
+    background-color: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.custom-checkbox.bg-success {
+    background-color: #198754 !important;
+    border-color: #198754 !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e");
+}
+
+.custom-checkbox:focus {
+    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+    border-color: #198754;
+}
+
+.task-actions {
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+    background-color: #f8f9fa;
+    border-left: 1px solid #e0e0e0;
+    align-items: flex-start !important; 
+    padding-top: 0;
+    padding-left: 10px;
+    padding-right: 10px;
+    display: flex;
+    height: auto;
+    min-height: 100%;
+}
+
+.task-row:hover .task-actions {
+    opacity: 1;
+}
+
+.action-icon {
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: #999;
+    transition: color 0.2s;
+}
+
+.action-icon:hover {
+    color: #333;
+}
+
+.action-icon.text-danger:hover {
+    color: #dc3545 !important;
+}
+
+.task-actions .separator {
+    color: #ccc;
+    margin: 0 8px;
+    font-size: 0.8rem;
+    cursor: default;
+}
+
+.task-row-container {
+    transition: all 0.2s ease;
+    background-color: white;
+}
+
+.edit-mode-container {
+    background-color: #fcfcfc !important;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+    border-left: 4px solid #346098;
+}
+
+.edit-mode-container textarea:focus,
+.edit-mode-container input:focus {
+    border-color: #346098;
+    box-shadow: 0 0 0 0.2rem rgba(52, 96, 152, 0.25);
+}
+
+.edit-mode-container textarea {
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.form-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.2rem;
+}
+
+.btn-glossy-green {
+    background: linear-gradient(to bottom, #7db785 0%, #4e9b5a 100%);
+    border: 1px solid #3c7d46;
+    color: white;
+    font-weight: bold;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.4);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+    border-radius: 4px;
+}
+.btn-glossy-green:hover {
+    background: linear-gradient(to bottom, #4e9b5a 0%, #3c7d46 100%);
+    color: white;
+}
+
+.btn-big-blue {
+    background: linear-gradient(to bottom, #598bc8 0%, #346098 100%);
+    border: 1px solid #234775;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 10px 30px;
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3);
+    text-shadow: 0 -1px 0 rgba(0,0,0,0.5);
+}
+.btn-big-blue:hover {
+    background: linear-gradient(to bottom, #4676b0 0%, #2b5080 100%);
+    color: white;
+}
+
+.btn-logout {
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    font-weight: bold;
+    text-decoration: none;
+    background: rgba(0,0,0,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 4px;
+    padding: 5px 15px;
+    transition: background 0.2s;
+}
+.btn-logout:hover {
+    background: rgba(0,0,0,0.2);
+    color: #fff;
+}

@@ -1,0 +1,139 @@
+<div class="task-row-container" 
+     id="task-{{ task.id }}"
+     style="border-bottom: 1px solid #e0e0e0;"
+     x-data="{ 
+        editing: false, 
+        expanded: false,  
+        datePart: '{{ task.deadline|date:'Y-m-d'|default:'' }}', 
+        timePart: '{{ task.deadline|date:'H:i'|default:'' }}' 
+     }">
+
+    <div class="task-row d-flex align-items-start" x-show="!editing"> 
+        
+        <div class="col-auto px-0 separator-col d-flex justify-content-center pt-2" style="min-height: 44px; height: auto;">
+            <input type="checkbox" 
+                class="form-check-input custom-checkbox {% if task.is_done %}bg-success border-success{% endif %}" 
+                {% if task.is_done %}checked{% endif %}
+                hx-post="{% url 'task-complete' task.id %}"
+                hx-target="#task-{{ task.id }}"
+                hx-swap="outerHTML"
+                style="margin-top: 6px; cursor: pointer;">
+        </div>
+        
+        <div class="col px-3 py-2">
+            <div class="d-flex justify-content-between align-items-start">
+                
+                <div class="task-title-text {% if task.is_done %}text-muted text-decoration-line-through{% endif %}"
+                     style="color: #666; font-weight: 500; word-break: break-word; cursor: pointer;"
+                     @click="expanded = !expanded"
+                     title="Click to expand/collapse full text">
+                    
+                    <span x-show="!expanded">
+                        {{ task.short_title }}
+                        {% if task.title|length > 50 %}
+                            <small class="text-primary opacity-50" style="font-size: 0.7em;">(more)</small>
+                        {% endif %}
+                    </span>
+
+                    <span x-show="expanded" style="display: none; white-space: pre-wrap;">{{ task.title }}</span>
+                </div>
+                
+                {% if task.deadline %}
+                    <span class="badge bg-light text-dark border ms-2 text-nowrap user-select-none mt-1" 
+                        style="cursor: pointer;"
+                        x-data="{ showTime: false }"
+                        @click="showTime = !showTime">
+                        <span x-show="!showTime"><i class="bi bi-calendar-event"></i> {{ task.deadline|date:"d M" }}</span>
+                        <span x-show="showTime" style="display: none;"><i class="bi bi-clock"></i> {{ task.deadline|date:"H:i" }}</span>
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-auto px-3 task-actions border-start d-flex align-items-center bg-light" 
+            style="min-height: 44px; height: auto;"> 
+            
+            <div class="d-flex align-items-center" style="height: 44px;"> 
+                
+                <div class="d-flex flex-column justify-content-center me-2 gap-1">
+                    {% if not forloop.first %}
+                    <i class="bi bi-caret-up-fill arrow-btn" 
+                       title="Move Up"
+                       style="cursor: pointer; font-size: 0.7rem; line-height: 0.7; color: #aaa;"
+                       onmouseover="this.style.color='#666'"
+                       onmouseout="this.style.color='#aaa'"
+                       hx-post="{% url 'task-move' task.id 'up' %}"
+                       hx-target="#task-list-{{ task.project.id }}"
+                       hx-swap="innerHTML"></i>
+                    {% else %}
+                    <div style="height: 8px;"></div>
+                    {% endif %}
+
+                    {% if not forloop.last %}
+                    <i class="bi bi-caret-down-fill arrow-btn" 
+                       title="Move Down"
+                       style="cursor: pointer; font-size: 0.7rem; line-height: 0.7; color: #aaa;"
+                       onmouseover="this.style.color='#666'"
+                       onmouseout="this.style.color='#aaa'"
+                       hx-post="{% url 'task-move' task.id 'down' %}"
+                       hx-target="#task-list-{{ task.project.id }}"
+                       hx-swap="innerHTML"></i>
+                    {% else %}
+                    <div style="height: 8px;"></div>
+                    {% endif %}
+                </div>
+
+                <span class="mx-2 text-muted opacity-50">|</span>
+                
+                <i class="bi bi-pencil-fill action-icon" title="Edit" @click="editing = true"></i>
+                
+                <span class="mx-2 text-muted opacity-50">|</span>
+                
+                <i class="bi bi-trash-fill action-icon text-danger" title="Delete"
+                   hx-delete="{% url 'task-delete' task.id %}"
+                   hx-target="#task-{{ task.id }}"
+                   hx-swap="outerHTML"
+                   hx-trigger="confirmed"
+                   @click="$dispatch('open-delete-modal', { confirm: () => $el.dispatchEvent(new Event('confirmed')) })">
+                </i>
+            </div>
+        </div>
+    </div>
+
+    <div class="edit-mode-container p-3 bg-white" x-show="editing" style="display: none;">
+        <form hx-post="{% url 'task-update' task.id %}" 
+              hx-target="#task-{{ task.id }}" 
+              hx-swap="outerHTML">
+            
+            <div class="row g-3">
+                <div class="col-12">
+                    <label class="form-label text-muted small fw-bold text-uppercase">Title:</label>
+                    <textarea name="title" rows="4" class="form-control" style="resize: vertical; min-height: 100px;">{{ task.title }}</textarea>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label text-muted small fw-bold text-uppercase">Date:</label>
+                    <div class="input-group">
+                        <input type="date" class="form-control" x-model="datePart">
+                        <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label text-muted small fw-bold text-uppercase">Time:</label>
+                    <div class="input-group">
+                        <input type="time" class="form-control" x-model="timePart">
+                        <span class="input-group-text"><i class="bi bi-clock"></i></span>
+                    </div>
+                </div>
+
+                <input type="hidden" name="deadline" :value="datePart && timePart ? datePart + ' ' + timePart : (datePart ? datePart : '')">
+
+                <div class="col-12 d-flex justify-content-end gap-2 mt-3 pt-2 border-top">
+                    <button type="button" @click="editing = false" class="btn btn-secondary btn-sm px-3">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm px-4">Save Changes</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
