@@ -33,7 +33,10 @@ class Task(models.Model):
 
     @property
     def short_title(self):
-        return self.title.split("\n")[0][:50]
+        text = self.title.split("\n")[0][:50]
+        if len(self.title) > 50:
+            return text + "..."
+        return text
 
     def __str__(self):
         return self.short_title
