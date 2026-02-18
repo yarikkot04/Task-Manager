@@ -91,3 +91,94 @@ class TaskFlowTests(TestCase):
         response = self.client.post(url, {"title": "Hacker Task"})
 
         self.assertEqual(response.status_code, 404)
+
+
+class ProjectViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="mainuser", password="password")
+
+        self.other_user = User.objects.create_user(
+            username="hacker", password="password"
+        )
+
+        self.client = Client()
+        self.client.force_login(self.user)
+
+        self.project = Project.objects.create(name="My Project", user=self.user)
+
+    def test_project_create_success(self):
+        url = reverse("project-create")
+        data = {"name": "New Test Project"}
+
+        response = self.client.post(url, data)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertTrue(
+            Project.objects.filter(name="New Test Project", user=self.user).exists()
+        )
+
+        self.assertTemplateUsed(response, "tasks/partials/project_card.html")
+
+        self.assertIn("project", response.context)
+
+    def test_project_update_success(self):
+        url = reverse("project-update", args=[self.project.id])
+        data = {"name": "Renamed Project"}
+
+        response = self.client.post(url, data)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.project.refresh_from_db()
+        self.assertEqual(self.project.name, "Renamed Project")
+
+        self.assertTemplateUsed(response, "tasks/partials/project_header.html")
+
+    def test_project_update_access_denied(self):
+        other_project = Project.objects.create(
+            name="Other Project", user=self.other_user
+        )
+
+        url = reverse("project-update", args=[other_project.id])
+        data = {"name": "Hacked Name"}
+
+        response = self.client.post(url, data)
+
+        self.assertEqual(response.status_code, 404)
+
+        other_project.refresh_from_db()
+        self.assertEqual(other_project.name, "Other Project")
+
+    def test_project_delete_success(self):
+        url = reverse("project-delete", args=[self.project.id])
+
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(response.content, b"")
+
+        self.assertFalse(Project.objects.filter(id=self.project.id).exists())
+
+    def test_project_delete_access_denied(self):
+        other_project = Project.objects.create(
+            name="Dont Touch This", user=self.other_user
+        )
+
+        url = reverse("project-delete", args=[other_project.id])
+
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, 404)
+
+        self.assertTrue(Project.objects.filter(id=other_project.id).exists())
+
+    def test_anonymous_user_cannot_create_project(self):
+        self.client.logout()
+
+        url = reverse("project-create")
+        response = self.client.post(url, {"name": "Anon Project"})
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.url.startswith("/accounts/login/"))
